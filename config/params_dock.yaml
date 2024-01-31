@@ -1,0 +1,30 @@
+load:
+  path:
+    load:
+      'data/raw'
+    write:
+      'data/processed'
+
+  images:
+    actress:
+      ["Angelina Jolie", "Cameron Diaz", "Emma Stone", "Jennifer Aniston", "Megan Fox", "Keira Knightley", "Nina Dobrev" , "Pen\u00e9lope Cruz"]
+    SIZE:
+      256
+    limit_load:
+      15
+
+train:
+  key_load_img:
+    False
+  test_size:
+    0.25
+  random_state:
+    10
+  path_model:
+    'model/model.pkl'
+
+predict:
+  SIZE:
+    1024
+  path_load:
+    'test_image.jpg'

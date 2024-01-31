@@ -1,0 +1,7 @@
+# расскоментировать строки ниже для нового проекта
+#/dataset/raw/*
+#/dataset/processed/*
+
+/env
+#/model/*
+/notebook
