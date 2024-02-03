@@ -9,7 +9,7 @@ predict:
   path_load: data/test_img/test_image.jpeg
   path_model: model/model.pkl
   random_state: 10
-  version_lr: 11
+  version_lr: 21
 train:
   dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor
   key_load_img: false

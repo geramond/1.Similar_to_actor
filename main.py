@@ -19,7 +19,7 @@ import train
 import predict
 
 
-config_path = os.path.join('/Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor/config/params.yaml')
+config_path = os.path.join('/config/params.yaml')
 config = yaml.safe_load(open('config/params.yaml'))['predict']
 path_model = config['path_model']
 SIZE = config['SIZE']
@@ -95,8 +95,8 @@ def main():
         path_sample = dir + random.choice(os.listdir(dir))
 
         image_actress_sample = Image.open(path_sample)
+        st.success(f'{result_predict}')
         if not img_file_buffer:
-            st.success(f'{result_predict}')
             st.image(image_actress_sample)
         else:
             st.image([img_file_buffer, image_actress_sample], width=750)
@@ -133,4 +133,3 @@ if __name__ == '__main__':
 # - MEN/WOMEN RECOGNITION
 # - 2 IMAGES IN 1 ROW (width=50%)
 # - REFORMAT CODE ACCORDING PEP8
-# - REFORMAT README

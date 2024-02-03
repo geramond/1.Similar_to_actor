@@ -17,7 +17,7 @@ import numpy as np
 import src
 
 
-config_path = os.path.join('/Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor/config/params.yaml')
+config_path = os.path.join('config/params.yaml')
 config = yaml.safe_load(open('config/params.yaml'))['predict']
 path_model = config['path_model']
 SIZE = config['SIZE']
