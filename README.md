@@ -1,4 +1,4 @@
-# 1.Realty_price_predict
+# 1.Similar to actor
 
 RUN (Streamlit)
 ```
