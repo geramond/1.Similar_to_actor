@@ -1,62 +1,33 @@
-# Tutorial docker for Data Science project
+# 1.Realty_price_predict
 
-- Установка Docker
-https://docs.docker.com/get-docker/
-
-- Собрать образ
+RUN (Streamlit)
 ```
-docker build -t your-name-image .
+streamlit run main.py
 ```
 
-- Посмотреть все собранные образы
+- Docker
 ```
-docker images
-```
+- Собрать образ: docker build -t your-name-image .
+- Посмотреть все собранные образы: docker images
+- Удалить Docker образ: docker rmi your-id-image
 
-- Удалить Docker образ
-```
-docker rmi your-id-image
-```
+- Собрать приложение из Docker image (контейнер): docker run your-name-image
+- Если хотим запустить конкретный, например, скрипт внутри образа: docker run your-name-image python train.py
 
-- Собрать приложение из Docker image (контейнер)
-```
-docker run your-name-image
-```
+- Посмотреть все запущенные контейнеры: docker ps
+- Посмотреть все запущенные/не запущенные контейнеры: docker ps -a
 
-- Если хотим запустить конкретный, например, скрипт внутри образа
-```
-docker run your-name-image python train.py
-```
+- Остановить запущенный определенный контейнер: docker stop my_container
+- Остановить все запущенные контейнеры (если они есть): docker stop $(docker ps -a -q)
 
-- Посмотреть все запущенные контейнеры
-```
-docker ps   
-```
-
-- Посмотреть все запущенные/не запущенные контейнеры
-```
-docker ps -a
-```
-
-- Остановить запущенный определенный контейнер
-```
-docker stop my_container
-```
-
-- Остановить все запущенные контейнеры (если они есть)
-```
-docker stop $(docker ps -a -q)
-```
-
-- Удалить все контейнеры (если они есть)
-```
-docker container rm $(docker ps -a -q)
+- Удалить все контейнеры (если они есть): docker container rm $(docker ps -a -q)
 ```
 
 - Mlflow
 ```
 pip install mlflow
 
+mkdir mlflow
 export MLFLOW_REGISTRY_URI=mlflow
 
 Запуск сервера: mlflow server --host localhost --port 5000 --backend-store-uri sqlite:///${MLFLOW_REGISTRY_URI}/mlflow.db --default-artifact-root ${MLFLOW_REGISTRY_URI}
@@ -65,8 +36,6 @@ export MLFLOW_REGISTRY_URI=mlflow
 - Airflow
 ```
 pip install apache-airflow==2.8.1 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt"
-
-export AIRFLOW_HOME=~/IT/DS_practice/4.CV/1.Similar_to_actor/airflow
 
 airflow db init
 
@@ -77,16 +46,10 @@ load_examples = False
 airflow users create --username geramond --firstname Maksim --lastname Fomin --role Admin --email geramond@gmail.com
 
 airflow webserver -p 8080
-
 airflow scheduler
 ```
 
 - FastAPI
 ```
 python3 -m uvicorn main:app --host=127.0.0.1 --port 8000 --reload
-```
-
-Streamlit
-```
-streamlit run main.py
 ```
