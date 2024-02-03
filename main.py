@@ -95,9 +95,11 @@ def main():
         path_sample = dir + random.choice(os.listdir(dir))
 
         image_actress_sample = Image.open(path_sample)
-        st.success(f'{result_predict}')
-        if img_file_buffer:
-            st.image([img_file_buffer, image_actress_sample])
+        if not img_file_buffer:
+            st.success(f'{result_predict}')
+            st.image(image_actress_sample)
+        else:
+            st.image([img_file_buffer, image_actress_sample], width=750)
 
     button_mlflow = st.button("MLFlow")
     if button_mlflow:
@@ -124,5 +126,11 @@ def main():
     #     os.system(f"{docker_cmd}")
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
+
+# TODO
+# - MEN/WOMEN RECOGNITION
+# - 2 IMAGES IN 1 ROW (width=50%)
+# - REFORMAT CODE ACCORDING PEP8
+# - REFORMAT README

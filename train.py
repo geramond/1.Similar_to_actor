@@ -18,16 +18,19 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score
 import src
 
 
-config_path = os.path.join('/Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor/config/params.yaml')
+# config_path = os.path.join('/Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor/config/params.yaml')
+config_path = os.path.join('config/params.yaml')
 config = yaml.safe_load(open('config/params.yaml'))['train']
+
 path_load = config['load']['path']['load']
 path_write = config['load']['path']['write']
+
 actress = config['load']['images']['actresses']
+RAND = config['random_state']
 SIZE = config['load']['images']['SIZE']
 limit = config['load']['images']['limit_load']
 
 key_load_img = config['key_load_img']
-RAND = config['random_state']
 test_size = config['test_size']
 path_model = config['path_model']
 
@@ -103,7 +106,7 @@ def load_files(path_to: str) -> Tuple[np.array, list]:
 
 def main():
     # If is it necessary download images from the internet
-    if key_load_img is True:
+    if key_load_img:
         # download images from the internet
         src.load_images(path_load, actress, limit_load=limit)
         # change image size
@@ -138,7 +141,7 @@ def main():
 
             print(f'F1 score = {f1_metric}')
 
-            # Логирование модели и параметров
+            # Model and parameters logging
             mlflow.log_param('f1', f1_metric)
             mlflow.log_param('accuracy', accuracy)
             mlflow.log_param('precision', precision)
@@ -149,7 +152,7 @@ def main():
                                 artifact_path='code')
             mlflow.end_run()
 
-        # Получение последней версии модели и сохраннение в файлы
+        # Get model last version and save to files
         client = MlflowClient()
         last_version_lr = get_version_model(config['model_lr'], client)
 
