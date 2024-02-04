@@ -9,7 +9,7 @@ predict:
   path_load: data/test_img/test_image.jpeg
   path_model: model/model.pkl
   random_state: 10
-  version_lr: 22
+  version_lr: 25
 train:
   dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor
   key_load_img: false
@@ -158,7 +158,7 @@ train:
       load: data/raw
       write: data/processed
   model_lr: LogisticRegression
-  name_experiment: experiment_3
+  name_experiment: experiment_7
   path_model: model/model.pkl
   random_state: 10
   test_size: 0.25

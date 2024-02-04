@@ -22,7 +22,7 @@ def init_dag(dag, task_id):
     with dag:
         t1 = BashOperator(
             task_id=f"{task_id}",
-            bash_command=f"python3 /Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor/{params['name']}.py")
+            bash_command=f"python3 /Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor/{params['name']}.py")
     return dag
 
 
