@@ -25,7 +25,7 @@ path_model = config['path_model']
 SIZE = config['SIZE']
 path_load = config['path_load']
 
-with open('data/processed/dict_labels.json', 'r') as openfile:
+with open('data/processed/women/dict_labels.json', 'r') as openfile:
     dict_labels = json.load(openfile)
 
 dict_labels = predict.process_dict_labels(dict_labels)
@@ -65,6 +65,7 @@ def get_predict(image_resize):
 
 
 def main():
+    st.set_page_config(layout="wide")
     st.header('Similar actor/actress')
     img_file_buffer = st.camera_input("Take a picture")
 
@@ -91,7 +92,7 @@ def main():
     if button_predict:
         result_predict = get_predict(image_resize)
 
-        dir = f"data/raw/{result_predict['predict_labels']}/"
+        dir = f"data/raw/women/{result_predict['predict_labels']}/"
         path_sample = dir + random.choice(os.listdir(dir))
 
         image_actress_sample = Image.open(path_sample)
@@ -130,6 +131,5 @@ if __name__ == '__main__':
     main()
 
 # TODO
-# - MEN/WOMEN RECOGNITION
-# - 2 IMAGES IN 1 ROW (width=50%)
-# - REFORMAT CODE ACCORDING PEP8
+#   - MEN/WOMEN RECOGNITION
+#   - REFORMAT CODE ACCORDING PEP8

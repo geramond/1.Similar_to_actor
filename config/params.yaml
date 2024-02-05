@@ -1,17 +1,19 @@
 predict:
   SIZE: 1024
-  dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor
+  dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor
   load:
     path:
-      load: data/raw
-      write: data/processed
+      load_men: data/raw/men
+      load_women: data/raw/women
+      write_men: data/processed/men
+      write_women: data/processed/women
   model_lr: LogisticRegression
   path_load: data/test_img/test_image.jpeg
   path_model: model/model.pkl
   random_state: 10
-  version_lr: 26
+  version_lr: 27
 train:
-  dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor
+  dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor
   key_load_img: false
   load:
     images:
@@ -155,8 +157,10 @@ train:
       - Winona Ryder
       limit_load: 15
     path:
-      load: data/raw
-      write: data/processed
+      load_men: data/raw/men
+      load_women: data/raw/women
+      write_men: data/processed/men
+      write_women: data/processed/women
   model_lr: LogisticRegression
   name_experiment: experiment_sa_1
   path_model: model/model.pkl

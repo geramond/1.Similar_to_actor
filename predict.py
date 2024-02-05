@@ -21,9 +21,11 @@ config_path = os.path.join('config/params.yaml')
 config = yaml.safe_load(open('config/params.yaml'))['predict']
 path_model = config['path_model']
 SIZE = config['SIZE']
-path_load = config['path_load']
 
-with open('data/processed/dict_labels.json', 'r') as openfile:
+path_load_actresses = config['load']['path']['load_women']
+path_load_actors = config['load']['path']['load_men']
+
+with open('data/processed/women/dict_labels.json', 'r') as openfile:
     dict_labels = json.load(openfile)
 
 # logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -33,7 +35,7 @@ logging.basicConfig(filename='log/app.log', filemode='w+', format='%(asctime)s :
 def process_dict_labels(dict_labels):
     list_of_empty = []
     for actress in list(dict_labels.keys()):
-        if not os.listdir(f"data/raw/{actress}"):
+        if not os.listdir(f"data/raw/women/{actress}"):
             list_of_empty.append(actress)
 
     for i in list_of_empty:
@@ -82,7 +84,7 @@ def main():
     model_uri_lr = f"models:/{config['model_lr']}/{config['version_lr']}"
     model = mlflow.sklearn.load_model(model_uri_lr)
 
-    file_img = Image.open(path_load)
+    file_img = Image.open(path_load_actresses)
     image_resize = np.array(src.resize_images(file_img, size_new=SIZE))
 
     predict_labels, predict_value, frame_proba = predict_actress(image=image_resize,

@@ -18,21 +18,26 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score
 import src
 
 
-# config_path = os.path.join('/Users/maksimfomin/IT/DS_practice/4.CV/Similar_to_actor/config/params.yaml')
+# config_path = os.path.join('/Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor/config/params.yaml')
 config_path = os.path.join('config/params.yaml')
 config = yaml.safe_load(open('config/params.yaml'))['train']
 
-path_load = config['load']['path']['load']
-path_write = config['load']['path']['write']
-
-actress = config['load']['images']['actresses']
 RAND = config['random_state']
+test_size = config['test_size']
 SIZE = config['load']['images']['SIZE']
 limit = config['load']['images']['limit_load']
-
 key_load_img = config['key_load_img']
-test_size = config['test_size']
+
 path_model = config['path_model']
+
+actresses = config['load']['images']['actresses']
+path_load_actresses = config['load']['path']['load_women']
+path_write_actresses = config['load']['path']['write_women']
+
+actors = config['load']['images']['actors']
+path_load_actors = config['load']['path']['load_men']
+path_write_actors = config['load']['path']['write_men']
+
 
 # logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logging.basicConfig(filename='log/app.log', filemode='w+', format='%(asctime)s : %(levelname)s : %(message)s',
@@ -107,16 +112,26 @@ def load_files(path_to: str) -> Tuple[np.array, list]:
 def main():
     # If is it necessary download images from the internet
     if key_load_img:
-        # download images from the internet
-        src.load_images(path_load, actress, limit_load=limit)
+        # Download images from the internet
+
+        # Women
+        src.load_images(path_load_actresses, actresses, limit_load=limit)
         # change image size
-        src.format_images(path_load, actress, SIZE)
+        src.format_images(path_load_actresses, actresses, SIZE)
         # get embeddings and save to folder
-        emb = src.GetEmbedings(list_actors=actress, path_load=path_load, path_write=path_write)
+        emb = src.GetEmbedings(list_actors=actresses, path_load=path_load_actresses, path_write=path_write_actresses)
         emb.get_save_embedding()
 
-    # open saved embeddings and dict with actresses
-    embedings, target_list = load_files(path_write)
+        # Men
+        src.load_images(path_load_actors, actors, limit_load=limit)
+        # change image size
+        src.format_images(path_load_actors, actors, SIZE)
+        # get embeddings and save to folder
+        emb = src.GetEmbedings(list_actors=actors, path_load=path_load_actors, path_write=path_write_actors)
+        emb.get_save_embedding()
+
+    # Open saved embeddings and dict with actresses
+    embedings, target_list = load_files(path_write_actresses)
     min_item, name_check = check_count_images(target_list)
 
     if min_item > 1:
