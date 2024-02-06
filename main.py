@@ -26,17 +26,21 @@ SIZE = config['SIZE']
 path_load = config['path_load']
 
 with open('data/processed/women/dict_labels.json', 'r') as openfile:
-    dict_labels = json.load(openfile)
+    dict_labels_women = json.load(openfile)
+dict_labels_women = predict.process_dict_labels(dict_labels_women, 'women')
 
-dict_labels = predict.process_dict_labels(dict_labels)
+with open('data/processed/men/dict_labels.json', 'r') as openfile:
+    dict_labels_men = json.load(openfile)
+dict_labels_men = predict.process_dict_labels(dict_labels_men, 'men')
+
 
 app = FastAPI()
 
 
 @st.cache_data
 @app.post('/get_train')
-def get_train():
-    f1, accuracy, precision = train.main()
+def get_train(gender):
+    f1, accuracy, precision = train.main(gender)
 
     result = {
         'f1': f'{f1}',
@@ -49,19 +53,35 @@ def get_train():
 
 @st.cache_data
 @app.post('/get_predict')
-def get_predict(image_resize):
+def get_predict(image_resize, dict_labels, gender):
     mlflow.set_tracking_uri("http://127.0.0.1:5000")
-    model_uri_lr = f"models:/{config['model_lr']}/{config['version_lr']}"
-    model = mlflow.sklearn.load_model(model_uri_lr)
-    predict_labels, predict_value, frame_proba = predict.predict_actress(image=image_resize,
-                                                                         model=model,
-                                                                         dict_labels=dict_labels)
-    result ={'message': 'success',
-            'predict_labels':f'{predict_labels}',
-            'predict_value':f'{predict_value}',
-            'frame_proba':f'{frame_proba}'
-            }
-    return result
+
+    if gender == "women":
+        model_uri_lr = f"models:/{config['model_lr_women']}/{config['version_lr_women']}"
+        model = mlflow.sklearn.load_model(model_uri_lr)
+        predict_labels, predict_value, frame_proba = predict.predict_actress(image=image_resize,
+                                                                             model=model,
+                                                                             dict_labels=dict_labels)
+        result = {'message': 'success',
+                  'predict_labels': f'{predict_labels}',
+                  'predict_value': f'{predict_value}',
+                  'frame_proba': f'{frame_proba}'
+                  }
+        return result
+
+    elif gender == "men":
+        model_uri_lr = f"models:/{config['model_lr_men']}/{config['version_lr_men']}"
+        model = mlflow.sklearn.load_model(model_uri_lr)
+        predict_labels, predict_value, frame_proba = predict.predict_actor(image=image_resize,
+                                                                             model=model,
+                                                                             dict_labels=dict_labels)
+        result ={'message': 'success',
+                'predict_labels':f'{predict_labels}',
+                'predict_value':f'{predict_value}',
+                'frame_proba':f'{frame_proba}'
+                }
+
+        return result
 
 
 def main():
@@ -83,14 +103,19 @@ def main():
         """
     )
 
-    button_train = st.button("Train")
-    if button_train:
-        result_train = get_train()
+    button_train_women = st.button("Train women")
+    if button_train_women:
+        result_train = get_train('women')
         st.success(f'{result_train}')
 
-    button_predict = st.button("Predict")
-    if button_predict:
-        result_predict = get_predict(image_resize)
+    button_train_men = st.button("Train men")
+    if button_train_men:
+        result_train = get_train('men')
+        st.success(f'{result_train}')
+
+    button_predict_women = st.button("Predict women")
+    if button_predict_women:
+        result_predict = get_predict(image_resize, dict_labels_women, 'women')
 
         dir = f"data/raw/women/{result_predict['predict_labels']}/"
         path_sample = dir + random.choice(os.listdir(dir))
@@ -101,6 +126,20 @@ def main():
             st.image(image_actress_sample)
         else:
             st.image([img_file_buffer, image_actress_sample], width=750)
+
+    button_predict_men = st.button("Predict men")
+    if button_predict_men:
+        result_predict = get_predict(image_resize, dict_labels_men, 'men')
+
+        dir = f"data/raw/men/{result_predict['predict_labels']}/"
+        path_sample = dir + random.choice(os.listdir(dir))
+
+        image_actor_sample = Image.open(path_sample)
+        st.success(f'{result_predict}')
+        if not img_file_buffer:
+            st.image(image_actor_sample)
+        else:
+            st.image([img_file_buffer, image_actor_sample], width=750)
 
     button_mlflow = st.button("MLFlow")
     if button_mlflow:

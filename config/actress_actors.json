@@ -59,7 +59,8 @@
   "Viola Davis",
   "Whoopi Goldberg",
   "Winona Ryder"],
- "men": ["Adam Sandler",
+ "men": [
+  "Adam Sandler",
   "Adrien Brody",
   "Al Pacino",
   "Anthony Hopkins",
@@ -132,4 +133,5 @@
   "Tom Hanks",
   "Tommy Lee Jones",
   "Will Smith",
-  "Willem Dafoe"]}
+  "Willem Dafoe"]
+}

@@ -18,7 +18,6 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score
 import src
 
 
-# config_path = os.path.join('/Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor/config/params.yaml')
 config_path = os.path.join('config/params.yaml')
 config = yaml.safe_load(open('config/params.yaml'))['train']
 
@@ -109,37 +108,42 @@ def load_files(path_to: str) -> Tuple[np.array, list]:
     return embedings, targets
 
 
-def main():
+def main(gender):
     # If is it necessary download images from the internet
     if key_load_img:
         # Download images from the internet
+        if gender == 'women':
+            # Women
+            src.load_images(path_load_actresses, actresses, limit_load=limit)
+            # change image size
+            src.format_images(path_load_actresses, actresses, SIZE)
+            # get embeddings and save to folder
+            emb = src.GetEmbedings(list_actors=actresses, path_load=path_load_actresses, path_write=path_write_actresses)
+            emb.get_save_embedding()
+        elif gender == 'men':
+            # Men
+            src.load_images(path_load_actors, actors, limit_load=limit)
+            # Change image size
+            src.format_images(path_load_actors, actors, SIZE)
+            # Get embeddings and save to folder
+            emb = src.GetEmbedings(list_actors=actors, path_load=path_load_actors, path_write=path_write_actors)
+            emb.get_save_embedding()
 
-        # Women
-        src.load_images(path_load_actresses, actresses, limit_load=limit)
-        # change image size
-        src.format_images(path_load_actresses, actresses, SIZE)
-        # get embeddings and save to folder
-        emb = src.GetEmbedings(list_actors=actresses, path_load=path_load_actresses, path_write=path_write_actresses)
-        emb.get_save_embedding()
-
-        # Men
-        src.load_images(path_load_actors, actors, limit_load=limit)
-        # change image size
-        src.format_images(path_load_actors, actors, SIZE)
-        # get embeddings and save to folder
-        emb = src.GetEmbedings(list_actors=actors, path_load=path_load_actors, path_write=path_write_actors)
-        emb.get_save_embedding()
-
-    # Open saved embeddings and dict with actresses
-    embedings, target_list = load_files(path_write_actresses)
-    min_item, name_check = check_count_images(target_list)
+    if gender == 'women':
+        # Open saved embeddings and dict with actresses
+        embedings, target_list = load_files(path_write_actresses)
+        min_item, name_check = check_count_images(target_list)
+    elif gender == 'men':
+        # Open saved embeddings and dict with actors
+        embedings, target_list = load_files(path_write_actors)
+        min_item, name_check = check_count_images(target_list)
 
     if min_item > 1:
         logging.info('Fitting the model')
 
         # MLFlow tracking
         mlflow.set_tracking_uri("http://127.0.0.1:5000")
-        mlflow.set_experiment(config['name_experiment'])
+        mlflow.set_experiment(config['name_experiment'] + '_' + gender)
         with (mlflow.start_run()):
             X_train, X_test, y_train, y_test = train_test_split(
                 embedings, target_list, test_size=test_size, stratify=target_list, random_state=RAND)
@@ -162,17 +166,17 @@ def main():
             mlflow.log_param('precision', precision)
             mlflow.sklearn.log_model(model,
                                      artifact_path='model_lr',
-                                     registered_model_name=f"{config['model_lr']}")
+                                     registered_model_name=f"{config[f'model_lr_{gender}']}")
             mlflow.log_artifact(local_path='./train.py',
                                 artifact_path='code')
             mlflow.end_run()
 
         # Get model last version and save to files
         client = MlflowClient()
-        last_version_lr = get_version_model(config['model_lr'], client)
+        last_version_lr = get_version_model(config[f"model_lr_{gender}"], client)
 
         yaml_file = yaml.safe_load(open(config_path))
-        yaml_file['predict']["version_lr"] = int(last_version_lr)
+        yaml_file['predict'][f"version_lr_{gender}"] = int(last_version_lr)
 
         with open(config_path, 'w') as fp:
             yaml.dump(yaml_file, fp, encoding='UTF-8', allow_unicode=True)
@@ -181,4 +185,5 @@ def main():
     return f1_metric, accuracy, precision
 
 if __name__ == "__main__":
-    main()
+    for gender in ('men', 'women'):
+        main(gender)
