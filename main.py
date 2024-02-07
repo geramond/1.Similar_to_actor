@@ -18,7 +18,6 @@ import src
 import train
 import predict
 
-
 config_path = os.path.join('/config/params.yaml')
 config = yaml.safe_load(open('config/params.yaml'))['predict']
 path_model = config['path_model']
@@ -32,7 +31,6 @@ dict_labels_women = predict.process_dict_labels(dict_labels_women, 'women')
 with open('data/processed/men/dict_labels.json', 'r') as openfile:
     dict_labels_men = json.load(openfile)
 dict_labels_men = predict.process_dict_labels(dict_labels_men, 'men')
-
 
 app = FastAPI()
 
@@ -54,32 +52,25 @@ def get_train(gender):
 @st.cache_data
 @app.post('/get_predict')
 def get_predict(image_resize, dict_labels, gender):
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
-
     if gender == "women":
-        model_uri_lr = f"models:/{config['model_lr_women']}/{config['version_lr_women']}"
-        model = mlflow.sklearn.load_model(model_uri_lr)
         predict_labels, predict_value, frame_proba = predict.predict_actress(image=image_resize,
-                                                                             model=model,
                                                                              dict_labels=dict_labels)
         result = {'message': 'success',
                   'predict_labels': f'{predict_labels}',
                   'predict_value': f'{predict_value}',
                   'frame_proba': f'{frame_proba}'
                   }
+
         return result
 
     elif gender == "men":
-        model_uri_lr = f"models:/{config['model_lr_men']}/{config['version_lr_men']}"
-        model = mlflow.sklearn.load_model(model_uri_lr)
         predict_labels, predict_value, frame_proba = predict.predict_actor(image=image_resize,
-                                                                             model=model,
-                                                                             dict_labels=dict_labels)
-        result ={'message': 'success',
-                'predict_labels':f'{predict_labels}',
-                'predict_value':f'{predict_value}',
-                'frame_proba':f'{frame_proba}'
-                }
+                                                                           dict_labels=dict_labels)
+        result = {'message': 'success',
+                  'predict_labels': f'{predict_labels}',
+                  'predict_value': f'{predict_value}',
+                  'frame_proba': f'{frame_proba}'
+                  }
 
         return result
 
