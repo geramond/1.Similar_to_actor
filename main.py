@@ -5,14 +5,10 @@ import random
 
 import numpy as np
 
-import pickle
 from PIL import Image
 
-import mlflow
 from fastapi import FastAPI
 import streamlit as st
-from pydantic import BaseModel
-import uvicorn
 
 import src
 import train
@@ -21,8 +17,10 @@ import predict
 CONFIG_PATH = os.path.join('/config/params.yaml')
 CONFIG = yaml.safe_load(open('config/params.yaml'))['predict']
 PATH_MODEL = CONFIG['path_model']
-SIZE = CONFIG['SIZE']
 PATH_LOAD = CONFIG['path_load']
+
+SIZE = CONFIG['SIZE']
+
 
 with open('data/processed/women/dict_labels.json', 'r') as openfile:
     dict_labels_women = json.load(openfile)
@@ -161,5 +159,5 @@ if __name__ == '__main__':
     main()
 
 # TODO
-#   - SOLVE ISSUE WITH PREDICT_SCORE, FRAME_PROBA
 #   - REFORMAT CODE ACCORDING PEP8
+s

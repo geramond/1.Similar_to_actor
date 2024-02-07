@@ -3,28 +3,26 @@ import yaml
 import json
 from typing import Tuple, Union
 
-import pickle
-import logging
+import pandas as pd
+import numpy as np
 
+import logging
 import mlflow
 
 from PIL import Image
 import face_recognition
-
-import pandas as pd
-import numpy as np
 
 import src
 
 CONFIG_PATH = os.path.join('config/params.yaml')
 CONFIG = yaml.safe_load(open('config/params.yaml'))['predict']
 PATH_MODEL = CONFIG['path_model']
+PATH_LOAD = CONFIG['path_load']
+
 SIZE = CONFIG['SIZE']
 
 PATH_LOAD_ACTRESSES = CONFIG['load']['path']['load_women']
 PATH_LOAD_ACTORS = CONFIG['load']['path']['load_men']
-
-PATH_LOAD = CONFIG['path_load']
 
 
 with open('data/processed/women/dict_labels.json', 'r') as openfile:
@@ -68,8 +66,9 @@ def predict_process(image, model, dict_labels):
 
         # Predict
         predict = model.predict([face_enc])
-        predict_name = list(dict_labels.keys())[list(dict_labels.values()).index(predict)]
-        predict_proba = model.predict_proba([face_enc])[0][predict][0]
+        idx = list(dict_labels.values()).index(predict)
+        predict_name = list(dict_labels.keys())[idx]
+        predict_proba = model.predict_proba([face_enc])[0][idx]
 
         # Add score to DataFrame
         frame_proba = pd.DataFrame()
@@ -127,6 +126,8 @@ def main(gender):
         predict_labels, predict_value, frame_proba = predict_actor(image=image_resize,
                                                                    dict_labels=dict_labels_men)
 
+    print(predict_labels)
+    print(predict_value)
     print(frame_proba[:5])
 
 

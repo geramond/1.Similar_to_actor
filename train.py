@@ -1,15 +1,15 @@
-import logging
 import os
+import yaml
+
+import numpy as np
 import pickle
 
 from typing import Tuple, Any
 from collections import Counter
 
-from mlflow.tracking import MlflowClient
+import logging
 import mlflow
-
-import yaml
-import numpy as np
+from mlflow.tracking import MlflowClient
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -20,6 +20,7 @@ import src
 
 CONFIG_PATH = os.path.join('config/params.yaml')
 CONFIG = yaml.safe_load(open('config/params.yaml'))['train']
+PATH_MODEL = CONFIG['path_model']
 
 RAND = CONFIG['random_state']
 TEST_SIZE = CONFIG['test_size']
@@ -27,7 +28,6 @@ SIZE = CONFIG['load']['images']['SIZE']
 LIMIT = CONFIG['load']['images']['limit_load']
 KEY_LOAD_IMG = CONFIG['key_load_img']
 
-PATH_MODEL = CONFIG['path_model']
 
 ACTRESSES = CONFIG['load']['images']['actresses']
 PATH_LOAD_ACTRESSES = CONFIG['load']['path']['load_women']
