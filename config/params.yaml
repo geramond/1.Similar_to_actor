@@ -8,13 +8,13 @@ predict:
       write_men: data/processed/men
       write_women: data/processed/women
   model_lr: LogisticRegression
+  model_lr_men: LogisticRegression_men
+  model_lr_women: LogisticRegression_women
   path_load: data/test_img/test_image.jpeg
   path_model: model/model.pkl
   random_state: 10
-  model_lr_men: LogisticRegression_men
-  model_lr_women: LogisticRegression_women
-  version_lr_men: 7
-  version_lr_women: 6
+  version_lr_men: 10
+  version_lr_women: 9
 train:
   dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor
   key_load_img: false

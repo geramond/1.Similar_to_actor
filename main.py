@@ -18,11 +18,11 @@ import src
 import train
 import predict
 
-config_path = os.path.join('/config/params.yaml')
-config = yaml.safe_load(open('config/params.yaml'))['predict']
-path_model = config['path_model']
-SIZE = config['SIZE']
-path_load = config['path_load']
+CONFIG_PATH = os.path.join('/config/params.yaml')
+CONFIG = yaml.safe_load(open('config/params.yaml'))['predict']
+PATH_MODEL = CONFIG['path_model']
+SIZE = CONFIG['SIZE']
+PATH_LOAD = CONFIG['path_load']
 
 with open('data/processed/women/dict_labels.json', 'r') as openfile:
     dict_labels_women = json.load(openfile)
@@ -84,7 +84,7 @@ def main():
         st.image(img_file_buffer)
         file_img = Image.open(img_file_buffer)
     else:
-        file_img = Image.open(path_load)
+        file_img = Image.open(PATH_LOAD)
     image_resize = np.array(src.resize_images(file_img, size_new=SIZE))
 
     st.markdown(
@@ -161,5 +161,5 @@ if __name__ == '__main__':
     main()
 
 # TODO
-#   - MEN/WOMEN RECOGNITION
+#   - SOLVE ISSUE WITH PREDICT_SCORE, FRAME_PROBA
 #   - REFORMAT CODE ACCORDING PEP8

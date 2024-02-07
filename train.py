@@ -18,24 +18,24 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score
 import src
 
 
-config_path = os.path.join('config/params.yaml')
-config = yaml.safe_load(open('config/params.yaml'))['train']
+CONFIG_PATH = os.path.join('config/params.yaml')
+CONFIG = yaml.safe_load(open('config/params.yaml'))['train']
 
-RAND = config['random_state']
-test_size = config['test_size']
-SIZE = config['load']['images']['SIZE']
-limit = config['load']['images']['limit_load']
-key_load_img = config['key_load_img']
+RAND = CONFIG['random_state']
+TEST_SIZE = CONFIG['test_size']
+SIZE = CONFIG['load']['images']['SIZE']
+LIMIT = CONFIG['load']['images']['limit_load']
+KEY_LOAD_IMG = CONFIG['key_load_img']
 
-path_model = config['path_model']
+PATH_MODEL = CONFIG['path_model']
 
-actresses = config['load']['images']['actresses']
-path_load_actresses = config['load']['path']['load_women']
-path_write_actresses = config['load']['path']['write_women']
+ACTRESSES = CONFIG['load']['images']['actresses']
+PATH_LOAD_ACTRESSES = CONFIG['load']['path']['load_women']
+PATH_WRITE_ACTRESSES = CONFIG['load']['path']['write_women']
 
-actors = config['load']['images']['actors']
-path_load_actors = config['load']['path']['load_men']
-path_write_actors = config['load']['path']['write_men']
+ACTORS = CONFIG['load']['images']['actors']
+PATH_LOAD_ACTORS = CONFIG['load']['path']['load_men']
+PATH_WRITE_ACTORS = CONFIG['load']['path']['write_men']
 
 
 # logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -71,92 +71,88 @@ def check_count_images(target: list) -> Tuple[int, str]:
 
 def fit(random_state: int,
         test_size: int,
-        embedings: np.array,
+        embeddings: np.array,
         target: list,
-        path_model: str) -> tuple[Any, float, Any]:
+        path_model: str) -> tuple[LogisticRegression, Any, float, Any]:
     """
     Model fit
-    :param embedings: embeddings with recognised faces
-    :param test_size: test size
+    :param random_state: random state
+    :param test_size: test sample size
+    :param embeddings: embeddings with recognised faces
+    :param target: target label
+    :param path_model: model path
     :return: None
     """
     X_train, X_test, y_train, y_test = train_test_split(
-        embedings, target, test_size=test_size, stratify=target, random_state=random_state)
+        embeddings, target, test_size=test_size, stratify=target, random_state=random_state)
 
     model = LogisticRegression()
     model.fit(X_train, y_train)
+
     with open(path_model, 'wb') as f:
         pickle.dump(model, f)
+
     f1_metric = f1_score(y_test, model.predict(X_test), average='macro')
     accuracy = accuracy_score(y_test, model.predict(X_test))
     precision = precision_score(y_test, model.predict(X_test), average='macro')
 
-    print(f'F1 score = {f1_metric}')
+    return model, f1_metric, accuracy, precision
 
 def load_files(path_to: str) -> Tuple[np.array, list]:
     """
     Download embeddings and target to fit
     :param path_to:
-    :return:
+    :return: embeddings, targets
     """
-    logging.info('Loading embedings & labels')
+    logging.info('Loading embeddings & labels')
     with open(f'{path_to}/embedings.pkl', 'rb') as f:
-        embedings = pickle.load(f)
+        embeddings = pickle.load(f)
 
     with open(f'{path_to}/labels.pkl', 'rb') as f:
         targets = pickle.load(f)
-    return embedings, targets
+    return embeddings, targets
 
 
 def main(gender):
     # If is it necessary download images from the internet
-    if key_load_img:
+    if KEY_LOAD_IMG:
         # Download images from the internet
         if gender == 'women':
             # Women
-            src.load_images(path_load_actresses, actresses, limit_load=limit)
+            src.load_images(PATH_LOAD_ACTRESSES, ACTRESSES, limit_load=LIMIT)
             # change image size
-            src.format_images(path_load_actresses, actresses, SIZE)
+            src.format_images(PATH_LOAD_ACTRESSES, ACTRESSES, SIZE)
             # get embeddings and save to folder
-            emb = src.GetEmbedings(list_actors=actresses, path_load=path_load_actresses, path_write=path_write_actresses)
+            emb = src.GetEmbedings(list_actors=ACTRESSES, path_load=PATH_LOAD_ACTRESSES, path_write=PATH_WRITE_ACTRESSES)
             emb.get_save_embedding()
         elif gender == 'men':
             # Men
-            src.load_images(path_load_actors, actors, limit_load=limit)
+            src.load_images(PATH_LOAD_ACTORS, ACTORS, limit_load=LIMIT)
             # Change image size
-            src.format_images(path_load_actors, actors, SIZE)
+            src.format_images(PATH_LOAD_ACTORS, ACTORS, SIZE)
             # Get embeddings and save to folder
-            emb = src.GetEmbedings(list_actors=actors, path_load=path_load_actors, path_write=path_write_actors)
+            emb = src.GetEmbedings(list_actors=ACTORS, path_load=PATH_LOAD_ACTORS, path_write=PATH_WRITE_ACTORS)
             emb.get_save_embedding()
+
+    # MLFlow tracking
+    mlflow.set_tracking_uri("http://127.0.0.1:5000")
+    mlflow.set_experiment(CONFIG['name_experiment'] + '_' + gender)
 
     if gender == 'women':
         # Open saved embeddings and dict with actresses
-        embedings, target_list = load_files(path_write_actresses)
+        embeddings, target_list = load_files(PATH_WRITE_ACTRESSES)
         min_item, name_check = check_count_images(target_list)
+
     elif gender == 'men':
         # Open saved embeddings and dict with actors
-        embedings, target_list = load_files(path_write_actors)
+        embeddings, target_list = load_files(PATH_WRITE_ACTORS)
         min_item, name_check = check_count_images(target_list)
 
     if min_item > 1:
         logging.info('Fitting the model')
 
-        # MLFlow tracking
-        mlflow.set_tracking_uri("http://127.0.0.1:5000")
-        mlflow.set_experiment(config['name_experiment'] + '_' + gender)
         with (mlflow.start_run()):
-            X_train, X_test, y_train, y_test = train_test_split(
-                embedings, target_list, test_size=test_size, stratify=target_list, random_state=RAND)
-
-            model = LogisticRegression()
-            model.fit(X_train, y_train)
-
-            with open(path_model, 'wb') as f:
-                pickle.dump(model, f)
-
-            f1_metric = f1_score(y_test, model.predict(X_test), average='macro')
-            accuracy = accuracy_score(y_test, model.predict(X_test))
-            precision = precision_score(y_test, model.predict(X_test), average='macro')
+            model, f1_metric, accuracy, precision = fit(RAND, TEST_SIZE, embeddings, target_list, PATH_MODEL)
 
             print(f'F1 score = {f1_metric}')
 
@@ -166,19 +162,19 @@ def main(gender):
             mlflow.log_param('precision', precision)
             mlflow.sklearn.log_model(model,
                                      artifact_path='model_lr',
-                                     registered_model_name=f"{config[f'model_lr_{gender}']}")
+                                     registered_model_name=f"{CONFIG[f'model_lr_{gender}']}")
             mlflow.log_artifact(local_path='./train.py',
                                 artifact_path='code')
             mlflow.end_run()
 
         # Get model last version and save to files
         client = MlflowClient()
-        last_version_lr = get_version_model(config[f"model_lr_{gender}"], client)
+        last_version_lr = get_version_model(CONFIG[f"model_lr_{gender}"], client)
 
-        yaml_file = yaml.safe_load(open(config_path))
+        yaml_file = yaml.safe_load(open(CONFIG_PATH))
         yaml_file['predict'][f"version_lr_{gender}"] = int(last_version_lr)
 
-        with open(config_path, 'w') as fp:
+        with open(CONFIG_PATH, 'w') as fp:
             yaml.dump(yaml_file, fp, encoding='UTF-8', allow_unicode=True)
     else:
         logging.info(f'Problem with size dataset {name_check}')
