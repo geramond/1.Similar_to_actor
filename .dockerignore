@@ -2,6 +2,6 @@
 #/dataset/raw/*
 #/dataset/processed/*
 
-/env
+/venv
 #/model/*
 /notebook

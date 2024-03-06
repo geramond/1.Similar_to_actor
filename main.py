@@ -159,5 +159,6 @@ if __name__ == '__main__':
     main()
 
 # TODO
+#   - FIX FastAPI Image upload
+#   - ADD Image upload to main page Streamlit
 #   - REFORMAT CODE ACCORDING PEP8
-s
