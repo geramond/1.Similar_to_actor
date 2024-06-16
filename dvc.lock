@@ -1,0 +1,14 @@
+schema: '2.0'
+stages:
+  train:
+    cmd: python train.py --config config/params.yaml
+    deps:
+    - path: config/params.yaml
+      hash: md5
+      md5: c8eb426a280a683b0c482cc2d6cf091b
+      size: 4029
+    - path: data/raw/
+      hash: md5
+      md5: bfd45dbe2fd51facf51252d36d01a59b.dir
+      size: 333551389
+      nfiles: 1859
