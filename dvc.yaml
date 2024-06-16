@@ -4,6 +4,3 @@ stages:
     deps:
     - config/params.yaml
     - data/raw/
-#    outs:
-#    - model/metrics.json
-#    - model/catclf.pkl
