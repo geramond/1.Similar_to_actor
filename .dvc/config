@@ -1,0 +1,4 @@
+['remote "s3"']
+    url = s3://similar-to-actor/main/
+    endpointurl = https://hb.ru-msk.vkcs.cloud
+    region = ru-msk

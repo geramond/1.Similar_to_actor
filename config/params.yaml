@@ -13,8 +13,8 @@ predict:
   path_load: data/test_img/test_image.jpeg
   path_model: model/model.pkl
   random_state: 10
-  version_lr_men: 13
-  version_lr_women: 12
+  version_lr_men: 15
+  version_lr_women: 14
 train:
   dir_folder: /Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor
   key_load_img: false
