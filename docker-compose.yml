@@ -1,0 +1,90 @@
+version: '3.7'
+# ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
+x-environment: &airflow_environment
+  - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+  - AIRFLOW__CORE__LOAD_EXAMPLES=True
+#  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__STORE_DAG_CODE=True
+  - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
+  - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  # custom vars
+  - DATA_VOLUME_PATH=/Users/maksimfomin/IT/DS_practice/4.CV/1.Similar_to_actor/
+
+x-airflow-image: &airflow_image apache/airflow:2.3.0-python3.8
+# ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+services:
+
+  init: # OK
+    build:
+      context: src/scheduler/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: airflow-docker
+    depends_on:
+      - postgres
+    environment: *airflow_environment
+    entrypoint: /bin/bash
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org && airflow connections add fs_default --conn-type fs'
+
+  webserver: # OK
+    build:
+      context: src/scheduler/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: airflow-docker
+
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    command: webserver
+
+  scheduler: # OK
+    build:
+      context: src/scheduler/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: airflow-docker
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - logs:/opt/airflow/logs
+      - ./dags/:/opt/airflow/dags/
+      - ./data/:/opt/airflow/data/
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment: *airflow_environment
+    command: scheduler
+
+#  ml_base:
+#    build:
+#      context: src/scheduler/ml-base
+#    image: ml-base
+#    restart: "no"
+
+  download:
+    build:
+#      context: src/scheduler/download
+      context: src/
+    image: load_data
+    restart: "no"
+
+  process:
+    build:
+      context: src/
+    image: process
+    restart: "no"
+
+  train:
+    build:
+      context: src/scheduler/train
+    image: train
+    restart: "no"
+
+volumes:
+  logs:

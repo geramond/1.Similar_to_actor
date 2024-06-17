@@ -54,7 +54,6 @@ class GetEmbedings:
                                                                 f"{person}/"
                                                                 f"{person_img}")
                         face_bounding_boxes = face_recognition.face_locations(face)
-                        # Если более одного лица на фото, либо их нет, то пропуск
                         # Skip if face_count != 1
                         if len(face_bounding_boxes) == 1:
                             try:
@@ -84,3 +83,9 @@ class GetEmbedings:
         json_object = json.dumps(self.get_labels(), indent=4)
         with open(f'{self.path_write}/dict_labels.json', 'w') as fp:
             fp.write(json_object)
+
+
+# if __name__ == "__main__":
+#     get_labels()
+#     get_embedings()
+#     get_embedings()
